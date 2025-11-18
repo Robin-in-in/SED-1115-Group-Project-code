@@ -1,10 +1,24 @@
 from machine import Pin, PWM, ADC
 from time import sleep
-from math import acos, asin, atan2, sqrt, degrees
+from math import acos, asin, atan2, sqrt, degrees, sin
+
+#----------------DEFINE ALL GLOBAL VARS---------------
+x_potentiometer = None
+y_potentiometer = None
+
+shoulder_servo = None
+elbow_servo = None
+pen_servo = None
+
+pen_button = None
+pen_state = None
+previous_button = None
+#----------------------------------------------------
 
 #----------------DEFINE POTENTIOMETERS---------------
-x_potentiometer = ADC(26)
-y_potentiometer = ADC(27)
+def setup_potentiometers():
+    x_potentiometer = ADC(26)
+    y_potentiometer = ADC(27)
 #----------------------------------------------------
 
 def read_x_pot():
@@ -24,22 +38,25 @@ def angle_to_duty(angle_deg):
 #----------------------------------------------------
 
 #----------------SETUP SERVOS-------------------------
-shoulder_servo = PWM(Pin(0))
-elbow_servo = PWM(Pin(1))
-pen_servo = PWM(Pin(2))
+def setup_servos():
+    shoulder_servo = PWM(Pin(0))
+    elbow_servo = PWM(Pin(1))
+    pen_servo = PWM(Pin(2))
 
-shoulder_servo.freq(50)
-elbow_servo.freq(50)
-pen_servo.freq(50)
+    shoulder_servo.freq(50)
+    elbow_servo.freq(50)
+    pen_servo.freq(50)
 #----------------------------------------------------
 
 #----------------SETUP BUTTON-------------------------
-pen_button = Pin(10, Pin.IN, Pin.PULL_UP)
-pen_state = 0
-previous_button = 1
+def setup_button():
+    pen_button = Pin(10, Pin.IN, Pin.PULL_UP)
+    pen_state = 0
+    previous_button = 1
 #----------------------------------------------------
 
 #----------------ARM LENGTH SETTINGS-----------------
+#TODO: Specify cm or inches in a comment
 L_a = 14.0   # upper arm (A->B)
 L_b = 14.0   # forearm (B->C)
 #----------------------------------------------------
@@ -49,8 +66,13 @@ A_base_x = 0
 A_base_y = 0
 #----------------------------------------------------
 
+#----------------PRE-MAIN LOOP SETUP-----------------------
+setup_servos()
+setup_button()
+setup_potentiometers()
 #----------------MAIN LOOP----------------------------
 while True:
+    #TODO: Break up main loop into some smaller functions
     raw_x = read_x_pot()
     raw_y = read_y_pot()
 
