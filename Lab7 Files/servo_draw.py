@@ -1,9 +1,8 @@
-import sys
+import sys, time
 from servo_translator import translate
 from machine import Pin, PWM, ADC
 from G_parser import GCodeParser
 
-pen_down = False
 # Initialize servos
 def setup_servos():
     shoulder_servo = PWM(Pin(0))
@@ -17,6 +16,7 @@ def setup_servos():
     return shoulder_servo, elbow_servo, pen_servo
 
 def main():
+    pen_down = False
     shoulder_servo, elbow_servo, pen_servo = setup_servos()
     print("Servo setup complete.")
     '''
@@ -44,29 +44,35 @@ def main():
 
             if shoulder is not None:
                 shoulder_servo.duty_u16(translate(shoulder))
+                time.sleep(0.1)
                 print(f"Move shoulder to {shoulder} degrees")
                 print("Corresponding to duty:", translate(shoulder))
 
             if elbow is not None:
                 elbow_servo.duty_u16(translate(elbow))
+                time.sleep(0.1)
                 print(f"Move elbow to {elbow} degrees")
                 print("Corresponding to duty:", translate(elbow))
 
         elif cmd == "M3":
-            if pen_down:
+            if pen_down and pen_servo:
                 pen_servo.duty_u16(10)
+                time.sleep(0.1)
                 print("Wrist DOWN")
                 pen_down=True
 
         elif cmd == "M5":
-            if not pen_down:
-                pen_servo.duty_u16(-10)
+            if not pen_down and pen_servo:
+                pen_servo.duty_u16(0)
+                time.sleep(0.1)
                 print("Wrist UP")
                 pen_down=False
 
         elif cmd == "M18":
             shoulder_servo.duty_u16(translate(0))
+            time.sleep(0.1)
             elbow_servo.duty_u16(translate(0))
+            time.sleep(0.1)
             shoulder_servo = None
             elbow_servo = None
             pen_servo = None

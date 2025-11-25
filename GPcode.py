@@ -17,6 +17,7 @@ previous_button = None
 
 #----------------DEFINE POTENTIOMETERS---------------
 def setup_potentiometers():
+    global x_potentiometer, y_potentiometer
     x_potentiometer = ADC(26)
     y_potentiometer = ADC(27)
 #----------------------------------------------------
@@ -28,17 +29,25 @@ def read_y_pot():
     return y_potentiometer.read_u16()
 
 #----------------CONVERT ANGLE TO SERVO DUTY---------
-def angle_to_duty(angle_deg):
-    if angle_deg < 0:
-        angle_deg = 0
-    elif angle_deg > 180:
-        angle_deg = 180
-    pulse_width = 500 + (2000 * angle_deg / 180)
-    return int((pulse_width / 20000) * 65535)
+def angle_to_duty(angle: float) -> int:
+	"""
+	Converts an angle in degrees to the corresponding input
+	for the duty_u16 method of the servo class
+	"""
+
+	MIN = 1638 # 0 degrees
+	MAX = 8192 # 180 degrees
+	DEG = (MAX - MIN) / 180 # value per degree
+
+	# clamp angle to be between 0 and 180
+	angle = max(0, min(180, angle))
+
+	return int(angle * DEG + MIN)
 #----------------------------------------------------
 
 #----------------SETUP SERVOS-------------------------
 def setup_servos():
+    global shoulder_servo, elbow_servo, pen_servo
     shoulder_servo = PWM(Pin(0))
     elbow_servo = PWM(Pin(1))
     pen_servo = PWM(Pin(2))
@@ -50,20 +59,21 @@ def setup_servos():
 
 #----------------SETUP BUTTON-------------------------
 def setup_button():
-    pen_button = Pin(10, Pin.IN, Pin.PULL_UP)
+    global pen_button, pen_state, previous_button
+    pen_button = Pin(10, Pin.IN, Pin.PULL_DOWN)
     pen_state = 0
     previous_button = 1
 #----------------------------------------------------
 
 #----------------ARM LENGTH SETTINGS-----------------
-#TODO: Specify cm or inches in a comment
-L_a = 14.0   # upper arm (A->B)
-L_b = 14.0   # forearm (B->C)
+#Component lengths in cm
+L_a = 15.5   # upper arm (A->B)
+L_b = 15.5   # forearm (B->C)
 #----------------------------------------------------
 
 #----------------BASE OFFSET--------------------------
 A_base_x = 0
-A_base_y = 0
+A_base_y = 1
 #----------------------------------------------------
 
 #----------------PRE-MAIN LOOP SETUP-----------------------
@@ -77,14 +87,14 @@ while True:
     raw_y = read_y_pot()
 
     # Convert pots to 8.5x11 inch paper workspace
-    PAPER_WIDTH_CM  = 21.59
-    PAPER_HEIGHT_CM = 27.94
+    PAPER_WIDTH_CM  = 27.94
+    PAPER_HEIGHT_CM = 21.59
     EDGE = 1.0
 
     DRAW_MIN_X = EDGE
-    DRAW_MAX_X = PAPER_WIDTH_CM  - EDGE
+    DRAW_MAX_Y = PAPER_WIDTH_CM  - EDGE
     DRAW_MIN_Y = EDGE
-    DRAW_MAX_Y = PAPER_HEIGHT_CM - EDGE
+    DRAW_MAX_X = PAPER_HEIGHT_CM - EDGE
 
     Cx = DRAW_MIN_X + (raw_x / 65535) * (DRAW_MAX_X - DRAW_MIN_X)
     Cy = DRAW_MIN_Y + (raw_y / 65535) * (DRAW_MAX_Y - DRAW_MIN_Y)
@@ -130,10 +140,10 @@ while True:
     current_button = pen_button.value()
     if previous_button == 1 and current_button == 0:
         if pen_state == 0:
-            pen_servo.duty_u16(angle_to_duty(45))
+            pen_servo.duty_u16(angle_to_duty(35))
             pen_state = 1
         else:
-            pen_servo.duty_u16(angle_to_duty(0))
+            pen_servo.duty_u16(angle_to_duty(20))
             pen_state = 0
         sleep(0.2)
     previous_button = current_button
