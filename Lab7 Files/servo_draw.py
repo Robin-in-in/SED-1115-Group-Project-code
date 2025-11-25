@@ -3,6 +3,7 @@ from servo_translator import translate
 from machine import Pin, PWM, ADC
 from G_parser import GCodeParser
 
+pen_down = False
 # Initialize servos
 def setup_servos():
     shoulder_servo = PWM(Pin(0))
@@ -18,10 +19,13 @@ def setup_servos():
 def main():
     shoulder_servo, elbow_servo, pen_servo = setup_servos()
     print("Servo setup complete.")
+    '''
+    # Some basic logic to test elbow servo 
     elbow_servo.duty_u16(translate(80))
     print("Duty equivalent: ", translate(80))
     print("Moved shoulder to 80 degrees for calibration.")
     return
+    '''
     parser = GCodeParser()
     try:
         instructions = parser.parse_file("circle.gcode")
@@ -49,12 +53,16 @@ def main():
                 print("Corresponding to duty:", translate(elbow))
 
         elif cmd == "M3":
-            #TODO: Lower the pen
-            print("Wrist DOWN")
+            if pen_down:
+                pen_servo.duty_u16(10)
+                print("Wrist DOWN")
+                pen_down=True
 
         elif cmd == "M5":
-            #TODO: Raise the pen
-            print("Wrist UP")
+            if not pen_down:
+                pen_servo.duty_u16(-10)
+                print("Wrist UP")
+                pen_down=False
 
         elif cmd == "M18":
             shoulder_servo.duty_u16(translate(0))
