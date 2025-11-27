@@ -81,12 +81,9 @@ setup_servos()
 setup_button()
 setup_potentiometers()
 
-shoulder_servo.duty_ns(1000 * 2500)
-elbow_servo.duty_ns(1000 * 2500)
-
 sleep(2)
 #----------------MAIN LOOP----------------------------
-while False:
+while True:
     #TODO: Break up main loop into some smaller functions
     raw_x = read_x_pot()
     raw_y = read_y_pot()
