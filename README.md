@@ -1,4 +1,7 @@
-This document serves as a minimal explanation of everything needed to begin working on the servodraw project.
+This README serves as a minimal explanation of LAB teachings for working on the servo draw project. 
+
+LINK TO LAB REPORT:
+https://docs.google.com/document/d/1TEQItjO9DLY58VQV-nFMb3gYJqDplEauadJRi8BolzM/edit?usp=sharing
 
 WHAT WE'RE TRYING TO DO:
 - Using the two potentiometers on the pico board we're going to move a "shoulder" and "elbow" that will move a pen. 
@@ -23,7 +26,7 @@ RELEVANT TEACHINGS FROM LAB 7 (Drawing):
 - I don't believe we will actually be reading a Gcode file for our project implementation.
 - There is useful logic in here for passing angles to the servos and drawing with them. 
 
-RELEVANT TEACHINGS FROM LAB 8 (Arm Movement):
+RELEVANT TEACHINGS FROM LAB 8 (Arm Movement With Coordinates):
 INVERSE KINEMATICS:
 - We only want to be able to draw in the range of a given box or "Page", the question is, how are we meant to know the angles we should be able to move our shoulder/elbow such that we can only cover the range of that "box"- not more and not less
 - For the shoulder and elbow, their ranges are 0 to 180 degrees- we will need to derive what angles are needed to arrive at any particular coordinate on our page.
