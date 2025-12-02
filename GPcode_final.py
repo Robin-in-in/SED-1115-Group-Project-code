@@ -75,7 +75,7 @@ def setup_servos():
 #----------------------------------------------------
 
 #----------------SETUP BUTTON-------------------------
-# Defined by Mohammed Urbani. 
+# Defined by Owen Barnacle. 
 def setup_button():
     global pen_button, pen_state, previous_button
     pen_button = Pin(10, Pin.IN, Pin.PULL_DOWN)
@@ -124,7 +124,7 @@ def calculate_angles_from_paramaters(c_x, c_y, length_AB, length_BC, s_offset, e
 #----------------------------------------------------------
 
 #-------------------WRIST TOGGLE---------------------------
-#Defined by Mohammed Urbani.
+#Defined by Owen Barnacle.
 def wrist_toggle():
     current_button = pen_button.value()
     if previous_button == 1 and current_button == 0:
